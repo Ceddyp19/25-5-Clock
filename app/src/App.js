@@ -2,8 +2,10 @@ import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <p>Bow Hello</p>
+    <div id='container'>
+      <div id="App">
+        <div id='title'>25 + 5 Clock</div>
+      </div>
     </div>
   );
 }
