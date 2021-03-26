@@ -1,6 +1,9 @@
 
 export default function TimerControl() {
     return (
-        <h1>Bow Hello!</h1>
+        <div className='timer-control'>
+            <button id='start_stop'>start/stop</button>
+            <button id='reset'>reset</button>
+            </div>
     )
 }
