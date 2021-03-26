@@ -1,10 +1,16 @@
+body {
+text-align: center;
+}
+
+
+/* 
 #container {
   display: flexbox;
   height: 100vh;
   justify-content: center;
   background-color: silver;
   align-items: center;
-}
+} */
 
 
 /* ody #container {
