@@ -1,10 +1,10 @@
-function Timer() {
+function Timer(props) {
     return (
         <div className='timer'>
             <div className='timer-wrapper'>
                 <div id='timer-label'>Session</div>
-                <div id='time-left'> 25:00 </div>
-        </div>
+                <div id='time-left'> {props.time}</div>
+            </div>
         </div>
     )
 }
