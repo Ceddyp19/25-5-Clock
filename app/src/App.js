@@ -26,18 +26,15 @@ class App extends React.Component {
   }
 
   toggleTimer = () => {
-    // console.log('start stop timer')
     this.setState({ isTimerRunning: !this.state.isTimerRunning })
-
-    // this.state.isTimerRunning === true ? this.pauseTimer() : this.runTimer();
-    // this.runTimer(time);
-    if (this.state.isTimerRunning) {
-      clearInterval(interval)
-    } else {
-      var interval = setInterval(() => this.runTimer(), 1000);
-    }
-
+    this.state.isTimerRunning === true ?  this.pauseTimer(this.intervalId) : this.intervalId = setInterval(() => this.runTimer(), 1000);; 
   }
+
+  pauseTimer = (interval) => {
+    clearInterval(interval);
+  }
+
+
   //helper function to toggleTimer that runs Timer
   runTimer = () => {
     let time = this.state.time,
@@ -107,10 +104,6 @@ class App extends React.Component {
     // this.interval = setInterval(function () { console.log('subtract second'); }, 1000)
     // console.log('bow hello!')
 
-  }
-
-  pauseTimer = () => {
-    // clearInterval(timer);
   }
 
   decrementLengthTime = (type) => {
