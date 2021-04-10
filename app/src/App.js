@@ -3,7 +3,7 @@ import TimerControl from './components/TimerControl';
 import React from 'react';
 import LengthControl from './components/LengthControl';
 import Timer from './components/Timer';
-
+const Audio = "https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
 
 class App extends React.Component {
   constructor(props) {
@@ -13,7 +13,8 @@ class App extends React.Component {
       sessionTime: 25,
       time: '25:00',
       isTimerRunning: false,
-      currentClockShown: 'Session'
+      currentClockShown: 'Session',
+      isBreakTimeClockRunning: false
     }
   }
 
@@ -24,6 +25,7 @@ class App extends React.Component {
       sessionTime: 25,
       time: '25:00',
       isTimerRunning: false,
+      currentClockShown: 'Session',
       isBreakTimeClockRunning: false
     })
   }
@@ -48,6 +50,7 @@ class App extends React.Component {
       updatedTime;
 
     if (minutes === 0 && seconds === 0) {
+      this.soundAlarm(Audio);
       // switch timers when one reaches '00:00'
       this.setState({ isBreakTimeClockRunning: !this.state.isBreakTimeClockRunning })
 
@@ -102,16 +105,6 @@ class App extends React.Component {
       }
 
     } 
-    // else if (seconds === 0 && minutes > 0) {
-
-    //   if (minutes < 10) {
-    //     updatedMinutes = '0' + String(minutes);
-    //     updatedSeconds = seconds;
-    //   } else {
-    //     updatedMinutes = minutes;
-    //     updatedSeconds = seconds;
-    //   }
-    // }
 
     updatedTime = updatedMinutes + ':' + updatedSeconds
     this.setState({ time: updatedTime })
@@ -124,7 +117,8 @@ class App extends React.Component {
 
     if (breakSessionTime > 1) {
       if (this.state.isTimerRunning === false && type === 'sessionTime') {
-        breakSessionTime > 10 ? this.setState({ time: `${breakSessionTime}:00` }) : this.setState({ time: `0${breakSessionTime}:00` })
+           // subtract one from breakSessionTime to counter async javascript
+        breakSessionTime > 10 ? this.setState({ time: `${breakSessionTime - 1}:00` }) : this.setState({ time: `0${breakSessionTime - 1}:00` })
       }
       this.setState({ [type]: breakSessionTime - 1 })
     }
@@ -136,10 +130,23 @@ class App extends React.Component {
 
     if (this.state[type] < 60) {
       if (this.state.isTimerRunning === false && type === 'sessionTime') {
-        breakSessionTime > 10 ? this.setState({ time: `${breakSessionTime}:00` }) : this.setState({ time: `0${breakSessionTime}:00` })
+        // add one to breakSessionTime to counter async javascript
+        breakSessionTime > 10 ? this.setState({ time: `${breakSessionTime + 1}:00` }) : this.setState({ time: `0${breakSessionTime + 1}:00` })
       }
       this.setState({ [type]: breakSessionTime + 1 })
     }
+  }
+
+  soundAlarm = (src) => {
+  
+    this.sound = document.createElement("audio");
+    this.sound.src = src;
+    this.sound.setAttribute("preload", "auto");
+    this.sound.setAttribute("controls", "none");
+    this.sound.style.display = "none";
+    document.body.appendChild(this.sound);
+  
+      this.sound.play();
   }
 
   render() {
@@ -159,3 +166,4 @@ class App extends React.Component {
 
 export default App;
 
+<audio id="beep" preload="auto" src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"></audio>
