@@ -12,22 +12,25 @@ class App extends React.Component {
       breakTime: 5,
       sessionTime: 25,
       time: '25:00',
-      isTimerRunning: false
+      isTimerRunning: false,
+      currentClockShown: 'Session'
     }
   }
 
   reset = () => {
-    console.log('reset time')
+    clearInterval(this.intervalId);
     this.setState({
       breakTime: 5,
       sessionTime: 25,
-      time: '25:00'
+      time: '25:00',
+      isTimerRunning: false,
+      isBreakTimeClockRunning: false
     })
   }
 
   toggleTimer = () => {
     this.setState({ isTimerRunning: !this.state.isTimerRunning })
-    this.state.isTimerRunning === true ?  this.pauseTimer(this.intervalId) : this.intervalId = setInterval(() => this.runTimer(), 1000);; 
+    this.state.isTimerRunning === true ? this.pauseTimer(this.intervalId) : this.intervalId = setInterval(() => this.runTimer(), 1000);;
   }
 
   pauseTimer = (interval) => {
@@ -44,81 +47,98 @@ class App extends React.Component {
       updatedSeconds,
       updatedTime;
 
+    if (minutes === 0 && seconds === 0) {
+      // switch timers when one reaches '00:00'
+      this.setState({ isBreakTimeClockRunning: !this.state.isBreakTimeClockRunning })
 
-    if (minutes === 0 && seconds === 0) return '00:00';
+      // convert number to MM:SS time
+      if (this.state.isBreakTimeClockRunning === true) {
+        let bT = this.state.breakTime
+        bT < 10 ? this.setState({ time: `0${bT}:00`, currentClockShown: 'Break' }) : this.setState({ time: `${bT}:00`, currentClockShown: 'Break' })
+      } else {
+        let sT = this.state.sessionTime
+        sT < 10 ? this.setState({ time: `0${sT}:00`, currentClockShown: 'Session' }) : this.setState({ time: `${sT}:00`, currentClockShown: 'Session' })
+      }
+      return;
+    }
 
 
-    if (seconds > 0) {
-      seconds -= 1
+    if (seconds > 0 || minutes > 0) {
+      // update seconds/minutes
+      if (seconds === 0 && minutes > 0) {
+        seconds = 59;
+        minutes--;
+      } else {
+        seconds--;
+      }
+   
+
 
       //when using parseInt, leading zeros are removed.
       //to replace leading zeros we add '0' at the beginning
       //which converts the entire statement back into a string
 
+      // format to mm:ss
       if (seconds < 10 && minutes < 10) {
 
         updatedSeconds = '0' + seconds;
         updatedMinutes = '0' + minutes;
 
-      } else if (seconds < 10 && minutes > 10) {
+      } else if (seconds < 10 && minutes >= 10) {
 
         updatedSeconds = '0' + seconds;
         updatedMinutes = minutes;
 
-      } else if (seconds < 10 && minutes > 10) {
+      } else if (seconds >= 10 && minutes < 10) {
 
         updatedSeconds = seconds;
         updatedMinutes = '0' + minutes;
 
-      } else if (seconds > 10 && minutes > 10) {
+      } else if (seconds >= 10 && minutes >= 10) {
 
         updatedSeconds = seconds;
         updatedMinutes = minutes;
 
       }
 
-    } else if (seconds === 0 && minutes > 0) {
-      seconds = 59
-      minutes -= 1
+    } 
+    // else if (seconds === 0 && minutes > 0) {
 
-      if (minutes < 10) {
-        updatedMinutes = '0' + String(minutes);
-        updatedSeconds = seconds;
-      } else {
-        updatedMinutes = minutes;
-        updatedSeconds = seconds;
-      }
-    }
+    //   if (minutes < 10) {
+    //     updatedMinutes = '0' + String(minutes);
+    //     updatedSeconds = seconds;
+    //   } else {
+    //     updatedMinutes = minutes;
+    //     updatedSeconds = seconds;
+    //   }
+    // }
 
     updatedTime = updatedMinutes + ':' + updatedSeconds
-    console.log(updatedTime)
     this.setState({ time: updatedTime })
-
-
-
-
-
-    // this.state.isTimerRunning === true ? setInterval(function() {console.log('subtract second'); }, 1000) : clearInterval();
-    // console.log('subtract second')
-
-    // this.interval = setInterval(function () { console.log('subtract second'); }, 1000)
-    // console.log('bow hello!')
 
   }
 
   decrementLengthTime = (type) => {
     //becuz my argument is a string, I use bracket notation to access state values
-    if (this.state[type] > 1) {
-      console.log('decrement', this.state[type])
-      this.setState({ [type]: this.state[type] - 1 })
+    let breakSessionTime = this.state[type];
+
+    if (breakSessionTime > 1) {
+      if (this.state.isTimerRunning === false && type === 'sessionTime') {
+        breakSessionTime > 10 ? this.setState({ time: `${breakSessionTime}:00` }) : this.setState({ time: `0${breakSessionTime}:00` })
+      }
+      this.setState({ [type]: breakSessionTime - 1 })
     }
 
   }
 
   incrementLengthTime = (type) => {
+    let breakSessionTime = this.state[type];
+
     if (this.state[type] < 60) {
-      console.log('increment')
-      this.setState({ [type]: this.state[type] + 1 })
+      if (this.state.isTimerRunning === false && type === 'sessionTime') {
+        breakSessionTime > 10 ? this.setState({ time: `${breakSessionTime}:00` }) : this.setState({ time: `0${breakSessionTime}:00` })
+      }
+      this.setState({ [type]: breakSessionTime + 1 })
     }
   }
 
@@ -129,7 +149,7 @@ class App extends React.Component {
           <div id='title'>25 + 5 Clock</div>
           <LengthControl id='break-label' title='Break Length' decrementBtnId='break-decrement' incrementBtnId='break-increment' lengthId='break-length' value={this.state.breakTime} incrementLengthTime={this.incrementLengthTime} decrementLengthTime={this.decrementLengthTime} type='breakTime' />
           <LengthControl id='session-label' title='Session Length' decrementBtnId='session-decrement' incrementBtnId='session-increment' lengthId='session-length' value={this.state.sessionTime} incrementLengthTime={this.incrementLengthTime} decrementLengthTime={this.decrementLengthTime} type='sessionTime' />
-          <Timer time={this.state.time} />
+          <Timer time={this.state.time} currentClockShown={this.state.currentClockShown} />
           <TimerControl reset={this.reset} toggleTimer={this.toggleTimer} />
         </div>
       </div>
