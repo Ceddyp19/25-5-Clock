@@ -3,7 +3,7 @@ import TimerControl from './components/TimerControl';
 import React from 'react';
 import LengthControl from './components/LengthControl';
 import Timer from './components/Timer';
-const Audio = "https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
+
 
 class App extends React.Component {
   constructor(props) {
@@ -28,6 +28,9 @@ class App extends React.Component {
       currentClockShown: 'Session',
       isBreakTimeClockRunning: false
     })
+    this.alarm = document.getElementById("beep")
+    this.alarm.pause();
+    this.alarm.currentTime = 0;
   }
 
   toggleTimer = () => {
@@ -50,7 +53,7 @@ class App extends React.Component {
       updatedTime;
 
     if (minutes === 0 && seconds === 0) {
-      this.soundAlarm(Audio);
+      this.soundAlarm();
       // switch timers when one reaches '00:00'
       this.setState({ isBreakTimeClockRunning: !this.state.isBreakTimeClockRunning })
 
@@ -137,15 +140,10 @@ class App extends React.Component {
     }
   }
 
-  soundAlarm = (src) => {
-  
-    this.sound = document.createElement("audio");
-    this.sound.src = src;
-    this.sound.setAttribute("preload", "auto");
+  soundAlarm = () => {
+    this.sound = document.getElementById("beep");
     this.sound.setAttribute("controls", "none");
     this.sound.style.display = "none";
-    document.body.appendChild(this.sound);
-  
       this.sound.play();
   }
 
@@ -158,6 +156,7 @@ class App extends React.Component {
           <LengthControl id='session-label' title='Session Length' decrementBtnId='session-decrement' incrementBtnId='session-increment' lengthId='session-length' value={this.state.sessionTime} incrementLengthTime={this.incrementLengthTime} decrementLengthTime={this.decrementLengthTime} type='sessionTime' />
           <Timer time={this.state.time} currentClockShown={this.state.currentClockShown} />
           <TimerControl reset={this.reset} toggleTimer={this.toggleTimer} />
+          <audio id="beep" preload="auto" src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"></audio>
         </div>
       </div>
     );
@@ -166,4 +165,3 @@ class App extends React.Component {
 
 export default App;
 
-<audio id="beep" preload="auto" src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"></audio>
