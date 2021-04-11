@@ -10,5 +10,3 @@ function Timer(props) {
 }
 
 export default Timer;
-
-// need to finish this project man
